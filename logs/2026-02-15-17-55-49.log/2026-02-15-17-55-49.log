@@ -1,0 +1,3 @@
+[2026-02-15 17:55:49,545] root - INFO - MongoDB client initialized successfully.
+[2026-02-15 17:55:49,687] root - INFO - CSV file 'E:\Network Security Project\Network_Data\phisingData.csv' converted to JSON successfully.
+[2026-02-15 17:56:01,991] root - INFO - Data pushed to MongoDB collection 'PhishingData' in database 'NetworkSecurity' successfully.
