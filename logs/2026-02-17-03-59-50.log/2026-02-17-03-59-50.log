@@ -1,0 +1,2 @@
+[2026-02-17 04:00:00,648] root - INFO - Starting the training pipeline
+[2026-02-17 04:00:00,648] root - ERROR - Error occurred in the training pipeline: 'TrainingPipelineConfig' object has no attribute 'artifact_name'

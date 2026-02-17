@@ -1,0 +1,2 @@
+[2026-02-17 04:02:52,376] root - INFO - Starting the training pipeline
+[2026-02-17 04:02:53,874] root - ERROR - Error occurred in the training pipeline: <module 'sys' (built-in)>: <module 'sys' (built-in)>: With n_samples=0, test_size=0.2 and train_size=None, the resulting train set will be empty. Adjust any of the aforementioned parameters.
