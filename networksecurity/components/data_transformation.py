@@ -63,8 +63,10 @@ class DataTransformation:
             logging.info(f"Transforming testing data")
             X_test_transformed = pipeline.transform(X_test)
             logging.info(f"Saving transformed training and testing data as numpy arrays")
-            save_numpy_array_data(self.data_transformation_config.transformed_train_file_path,X_train_transformed)
-            save_numpy_array_data(self.data_transformation_config.transformed_test_file_path,X_test_transformed)
+            train_arr = np.c_[X_train_transformed,np.array(y_train)]
+            test_arr = np.c_[X_test_transformed,np.array(y_test)]
+            save_numpy_array_data(self.data_transformation_config.transformed_train_file_path,train_arr)
+            save_numpy_array_data(self.data_transformation_config.transformed_test_file_path,test_arr)
             logging.info(f"Saving preprocessor object")
             save_object(self.data_transformation_config.preprocessor_object_file_path,pipeline)
             data_transformation_artifact = DataTransformationArtifact(
