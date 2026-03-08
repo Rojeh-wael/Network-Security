@@ -85,4 +85,4 @@ def predict_route(request: Request, file: UploadFile):
         raise NetworkSecurityException(e, sys) from e
     
 if __name__ == "__main__":
-    app_run(app, host="0.0.0.0", port=8000, timeout_keep_alive=300)
+    app_run(app, host="0.0.0.0", port=8080, timeout_keep_alive=300)
