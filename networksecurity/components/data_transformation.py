@@ -76,6 +76,7 @@ class DataTransformation:
             )
             preprocessor=self.get_data_transformer_object()
             preprocessor_object=preprocessor.fit(X_train)
+            save_object("final_model/preprocessor.pkl",preprocessor_object)
             return data_transformation_artifact
         except Exception as e:
             raise NetworkSecurityException(e,sys) from e

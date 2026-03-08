@@ -16,6 +16,8 @@ from sklearn.ensemble import (
     AdaBoostClassifier,
     GradientBoostingClassifier,
 )
+import dagshub
+dagshub.init(repo_owner='Rojeh-wael', repo_name='Network-Security', mlflow=True)
 
 class NetworkSecurityModelTrainer:
     def __init__(self,model_trainer_config:ModelTrainerConfig,data_transformation_artifact:DataTransformationArtifact):
@@ -27,7 +29,7 @@ class NetworkSecurityModelTrainer:
 
     def track_mlflow(self,model_name:str,model_accuracy:float,precision_score:float,recall_score:float,f1_score:float):
         import mlflow
-        mlflow.set_tracking_uri("http://localhost:5000")
+       ## mlflow.set_tracking_uri("https://dagshub.com/Rojeh-wael/Network-Security.mlflow")
         mlflow.set_experiment("Network Security Model Training")
         with mlflow.start_run(run_name=model_name):
             mlflow.log_metric("model_accuracy", model_accuracy)
@@ -105,6 +107,8 @@ class NetworkSecurityModelTrainer:
 
             logging.info(f"Saving the trained model")
             save_object(self.model_trainer_config.model_file_path,model)
+
+            save_object("final_model/model.pkl",model)
 
             train_metric_artifact = get_classification_score(y_train,model.predict(x_train),model_name="train_model")
             test_metric_artifact = get_classification_score(y_test,model.predict(x_test),model_name="test_model")
