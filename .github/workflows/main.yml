@@ -1,33 +1,33 @@
 name: workflow
+
 on:
   push:
-    branches:  
-      - main 
+    branches:
+      - main
     paths-ignore:
-    - 'README.md'
-    
+      - 'README.md'
 
 jobs:
-    integration:
-        name: Continuous Integration
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v2
 
-            - name: Lint code
-              run: echo "Linting repository"
+  integration:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-            - name: Run unit tests
-              run: echo "Running unit tests"
+      - name: Lint code
+        run: echo "Linting repository"
 
-
+      - name: Run unit tests
+        run: echo "Running unit tests"
 
   build-and-push-ECR-image:
     name: Build and Push Docker Image to ECR
     runs-on: ubuntu-latest
     needs: integration
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -46,6 +46,8 @@ jobs:
       - name: Build, tag, and push Docker image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: my-ecr-repository
+          ECR_REPOSITORY: networksecurityforphishingdata
           IMAGE_TAG: latest
- 
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
