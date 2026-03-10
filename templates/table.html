@@ -1,74 +1,81 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Network Security - Prediction Results</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            padding: 30px;
-        }
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 25px;
-            font-size: 1.8rem;
-        }
-        .table-container {
-            max-width: 100%;
-            overflow-x: auto;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-        thead th {
-            background-color: #2c3e50;
-            color: #fff;
-            padding: 12px 10px;
-            text-align: left;
-            white-space: nowrap;
-        }
-        tbody td {
-            padding: 10px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        tbody tr:hover {
-            background-color: #f5f7fa;
-        }
-        tbody tr:nth-child(even) {
-            background-color: #fafafa;
-        }
-        .prediction-safe {
-            color: #27ae60;
-            font-weight: bold;
-        }
-        .prediction-phishing {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
-    <h1>Network Security - Phishing Detection Results</h1>
-    <p style="text-align:center; color:#555; margin-bottom:15px;">
-        Showing first 100 of {{ total_rows }} total predictions.
-        Full results saved to <strong>prediction_output/output.csv</strong>
-    </p>
-    <div class="table-container">
-        {{ table | safe }}
+{% extends "base.html" %}
+{% block title %}Results{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div>
+                <h1 class="display-5 fw-bold mb-1">
+                    <i class="fas fa-chart-bar text-accent me-2"></i>
+                    Prediction <span class="text-gradient">Results</span>
+                </h1>
+                <p class="text-secondary mb-0">
+                    Showing first 100 of <strong class="text-white">{{ total_rows }}</strong> total predictions.
+                </p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="/predict-page" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-1"></i> New Prediction
+                </a>
+                <a href="/download-results" class="btn btn-accent">
+                    <i class="fas fa-download me-1"></i> Download CSV
+                </a>
+            </div>
+        </div>
     </div>
-</body>
-</html>
+</section>
+
+<!-- Summary Cards -->
+<section class="py-4">
+    <div class="container">
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-lg-3">
+                <div class="glass-card p-3 text-center">
+                    <div class="text-secondary small mb-1">Total Rows</div>
+                    <div class="fs-3 fw-bold text-accent">{{ total_rows }}</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="glass-card p-3 text-center">
+                    <div class="text-secondary small mb-1">Legitimate</div>
+                    <div class="fs-3 fw-bold text-success">{{ legitimate_count }}</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="glass-card p-3 text-center">
+                    <div class="text-secondary small mb-1">Phishing</div>
+                    <div class="fs-3 fw-bold text-danger">{{ phishing_count }}</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="glass-card p-3 text-center">
+                    <div class="text-secondary small mb-1">Phishing Rate</div>
+                    <div class="fs-3 fw-bold text-warning">{{ phishing_rate }}%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Table -->
+        <div class="glass-card p-4">
+            <div class="table-responsive results-table-wrap">
+                {{ table | safe }}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Color-code the predicted_column cells
+document.querySelectorAll('td').forEach(td => {
+    const text = td.textContent.trim();
+    if (text === 'Phishing') {
+        td.innerHTML = '<span class="badge bg-danger bg-opacity-15 text-danger px-2 py-1"><i class="fas fa-bug me-1"></i>Phishing</span>';
+    } else if (text === 'Legitimate') {
+        td.innerHTML = '<span class="badge bg-success bg-opacity-15 text-success px-2 py-1"><i class="fas fa-check me-1"></i>Legitimate</span>';
+    }
+});
+</script>
+{% endblock %}

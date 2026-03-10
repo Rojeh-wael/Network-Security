@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% block title %}Predict{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1 class="display-5 fw-bold">
+            <i class="fas fa-magnifying-glass-chart text-accent me-2"></i>
+            Phishing <span class="text-gradient">Prediction</span>
+        </h1>
+        <p class="text-secondary mb-0">
+            Upload a CSV file with network features to classify URLs as Legitimate or Phishing.
+        </p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Upload Card -->
+            <div class="col-lg-7">
+                <div class="glass-card p-4 p-lg-5">
+                    <h4 class="fw-semibold mb-4">
+                        <i class="fas fa-cloud-arrow-up text-accent me-2"></i> Upload Dataset
+                    </h4>
+
+                    <form id="predictForm" action="/predict" method="post" enctype="multipart/form-data">
+                        <div class="upload-zone" id="uploadZone">
+                            <input type="file" name="file" id="fileInput" accept=".csv" required hidden>
+                            <div class="upload-content text-center py-5" id="uploadContent">
+                                <i class="fas fa-file-csv upload-icon mb-3"></i>
+                                <h5 class="fw-semibold mb-2">Drop your CSV file here</h5>
+                                <p class="text-secondary small mb-3">or click to browse files</p>
+                                <span class="badge bg-secondary bg-opacity-25 text-secondary">
+                                    Accepted: .csv files
+                                </span>
+                            </div>
+                            <div class="file-preview d-none" id="filePreview">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="file-icon-lg">
+                                        <i class="fas fa-file-csv"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1 fw-semibold" id="fileName">-</h6>
+                                        <span class="text-secondary small" id="fileSize">-</span>
+                                    </div>
+                                    <button type="button" class="btn btn-outline-danger btn-sm" id="removeFile">
+                                        <i class="fas fa-xmark"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-accent btn-lg w-100 mt-4" id="predictBtn" disabled>
+                            <i class="fas fa-bolt me-2"></i>
+                            <span id="predictBtnText">Run Prediction</span>
+                            <span id="predictBtnSpinner" class="d-none">
+                                <span class="spinner-border spinner-border-sm me-2"></span> Processing...
+                            </span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info Panel -->
+            <div class="col-lg-5">
+                <div class="glass-card p-4 mb-4">
+                    <h5 class="fw-semibold mb-3">
+                        <i class="fas fa-circle-info text-info me-2"></i> Expected Format
+                    </h5>
+                    <p class="text-secondary small">
+                        Your CSV should include the following 30 network security features.
+                        The <code>Result</code> column is optional (it will be ignored during prediction).
+                    </p>
+                    <div class="feature-list-scroll">
+                        <div class="d-flex flex-wrap gap-1">
+                            {% set features = [
+                                "having_IP_Address", "URL_Length", "Shortining_Service",
+                                "having_At_Symbol", "double_slash_redirecting", "Prefix_Suffix",
+                                "having_Sub_Domain", "SSLfinal_State", "Domain_registeration_length",
+                                "Favicon", "port", "HTTPS_token", "Request_URL",
+                                "URL_of_Anchor", "Links_in_tags", "SFH",
+                                "Submitting_to_email", "Abnormal_URL", "Redirect",
+                                "on_mouseover", "RightClick", "popUpWidnow",
+                                "Iframe", "age_of_domain", "DNSRecord",
+                                "web_traffic", "Page_Rank", "Google_Index",
+                                "Links_pointing_to_page", "Statistical_report"
+                            ] %}
+                            {% for feat in features %}
+                            <span class="badge bg-dark border border-secondary border-opacity-25 fw-normal small">{{ feat }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-4">
+                    <h5 class="fw-semibold mb-3">
+                        <i class="fas fa-lightbulb text-warning me-2"></i> Output
+                    </h5>
+                    <ul class="list-unstyled text-secondary small mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Each row is classified as <strong class="text-success">Legitimate</strong> or <strong class="text-danger">Phishing</strong>.
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-table text-info me-2"></i>
+                            Results shown in an interactive table (first 100 rows).
+                        </li>
+                        <li>
+                            <i class="fas fa-download text-accent me-2"></i>
+                            Full results saved to <code>prediction_output/output.csv</code>.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const zone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+    const content = document.getElementById('uploadContent');
+    const preview = document.getElementById('filePreview');
+    const nameEl = document.getElementById('fileName');
+    const sizeEl = document.getElementById('fileSize');
+    const removeBtn = document.getElementById('removeFile');
+    const predictBtn = document.getElementById('predictBtn');
+    const form = document.getElementById('predictForm');
+    const btnText = document.getElementById('predictBtnText');
+    const btnSpinner = document.getElementById('predictBtnSpinner');
+
+    zone.addEventListener('click', () => fileInput.click());
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+        e.preventDefault();
+        zone.classList.remove('drag-over');
+        if (e.dataTransfer.files.length) {
+            fileInput.files = e.dataTransfer.files;
+            showFile(e.dataTransfer.files[0]);
+        }
+    });
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length) showFile(fileInput.files[0]);
+    });
+    removeBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        fileInput.value = '';
+        content.classList.remove('d-none');
+        preview.classList.add('d-none');
+        predictBtn.disabled = true;
+    });
+
+    form.addEventListener('submit', () => {
+        btnText.classList.add('d-none');
+        btnSpinner.classList.remove('d-none');
+        predictBtn.disabled = true;
+    });
+
+    function showFile(file) {
+        nameEl.textContent = file.name;
+        sizeEl.textContent = formatBytes(file.size);
+        content.classList.add('d-none');
+        preview.classList.remove('d-none');
+        predictBtn.disabled = false;
+    }
+
+    function formatBytes(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024, sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+});
+</script>
+{% endblock %}

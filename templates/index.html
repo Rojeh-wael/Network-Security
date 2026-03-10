@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section d-flex align-items-center">
+    <div class="hero-bg-grid"></div>
+    <div class="container position-relative">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-7">
+                <div class="hero-badge mb-3">
+                    <span class="badge bg-accent bg-opacity-15 text-accent px-3 py-2 rounded-pill">
+                        <i class="fas fa-lock me-1"></i> AI-Powered Security
+                    </span>
+                </div>
+                <h1 class="display-3 fw-800 mb-3">
+                    Detect <span class="text-gradient">Phishing</span><br>
+                    Before It Strikes
+                </h1>
+                <p class="lead text-secondary mb-4 pe-lg-5">
+                    Leverage machine learning to analyze network data and identify phishing websites 
+                    in real time. Upload your dataset and get instant classification results with 
+                    high accuracy.
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="/predict-page" class="btn btn-accent btn-lg px-4">
+                        <i class="fas fa-magnifying-glass-chart me-2"></i> Start Prediction
+                    </a>
+                    <a href="/train-page" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fas fa-brain me-2"></i> Train Model
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="hero-visual">
+                    <div class="shield-container">
+                        <div class="shield-glow"></div>
+                        <i class="fas fa-shield-halved shield-icon"></i>
+                        <div class="orbit orbit-1">
+                            <div class="orbit-dot"><i class="fas fa-bug"></i></div>
+                        </div>
+                        <div class="orbit orbit-2">
+                            <div class="orbit-dot"><i class="fas fa-link"></i></div>
+                        </div>
+                        <div class="orbit orbit-3">
+                            <div class="orbit-dot"><i class="fas fa-globe"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Strip -->
+<section class="py-4 bg-dark-subtle border-top border-bottom border-secondary border-opacity-10">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-6 col-md-3">
+                <div class="stat-value text-accent fw-bold fs-2">30+</div>
+                <div class="text-secondary small">Features Analyzed</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-value text-accent fw-bold fs-2">6</div>
+                <div class="text-secondary small">ML Models Compared</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-value text-accent fw-bold fs-2">97%+</div>
+                <div class="text-secondary small">Detection Accuracy</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-value text-accent fw-bold fs-2">&lt;1s</div>
+                <div class="text-secondary small">Prediction Speed</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5 my-4" id="features">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold display-6">How It <span class="text-gradient">Works</span></h2>
+            <p class="text-secondary mx-auto" style="max-width: 600px;">
+                Our ML pipeline processes your data through multiple stages to deliver accurate phishing detection.
+            </p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card h-100">
+                    <div class="feature-icon-wrap mb-3">
+                        <div class="feature-icon bg-primary bg-opacity-15">
+                            <i class="fas fa-database text-primary"></i>
+                        </div>
+                        <span class="step-number">01</span>
+                    </div>
+                    <h5 class="fw-semibold">Data Ingestion</h5>
+                    <p class="text-secondary small mb-0">
+                        Pull data from MongoDB or upload CSV files. Automatic train/test splitting with configurable ratios.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card h-100">
+                    <div class="feature-icon-wrap mb-3">
+                        <div class="feature-icon bg-info bg-opacity-15">
+                            <i class="fas fa-check-double text-info"></i>
+                        </div>
+                        <span class="step-number">02</span>
+                    </div>
+                    <h5 class="fw-semibold">Data Validation</h5>
+                    <p class="text-secondary small mb-0">
+                        Schema validation and data drift detection ensure your data matches expected patterns.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card h-100">
+                    <div class="feature-icon-wrap mb-3">
+                        <div class="feature-icon bg-warning bg-opacity-15">
+                            <i class="fas fa-wand-magic-sparkles text-warning"></i>
+                        </div>
+                        <span class="step-number">03</span>
+                    </div>
+                    <h5 class="fw-semibold">Transformation</h5>
+                    <p class="text-secondary small mb-0">
+                        KNN Imputer handles missing values. Features are preprocessed and normalized for optimal model performance.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card h-100">
+                    <div class="feature-icon-wrap mb-3">
+                        <div class="feature-icon bg-success bg-opacity-15">
+                            <i class="fas fa-robot text-success"></i>
+                        </div>
+                        <span class="step-number">04</span>
+                    </div>
+                    <h5 class="fw-semibold">Model Training</h5>
+                    <p class="text-secondary small mb-0">
+                        GridSearchCV evaluates 6 classifiers — Logistic Regression, KNN, Decision Tree, Random Forest, AdaBoost, and Gradient Boosting.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Models Section -->
+<section class="py-5 bg-dark-subtle">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold display-6">ML Models <span class="text-gradient">Arsenal</span></h2>
+            <p class="text-secondary">We pit multiple algorithms against each other and pick the champion.</p>
+        </div>
+        <div class="row g-3 justify-content-center">
+            {% set models = [
+                ("Logistic Regression", "fas fa-chart-line", "Linear baseline classifier"),
+                ("Decision Tree", "fas fa-sitemap", "Rule-based decision splits"),
+                ("K-Nearest Neighbors", "fas fa-circle-nodes", "Instance-based voting"),
+                ("Random Forest", "fas fa-tree", "Ensemble of decision trees"),
+                ("AdaBoost", "fas fa-bolt", "Adaptive boosting ensemble"),
+                ("Gradient Boosting", "fas fa-fire", "Sequential error correction")
+            ] %}
+            {% for name, icon, desc in models %}
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="model-card text-center p-3">
+                    <i class="{{ icon }} fs-2 text-accent mb-2 d-block"></i>
+                    <h6 class="fw-semibold small mb-1">{{ name }}</h6>
+                    <p class="text-secondary tiny mb-0">{{ desc }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 my-4">
+    <div class="container">
+        <div class="cta-card text-center p-5 rounded-4">
+            <h2 class="fw-bold mb-3">Ready to Secure Your Network?</h2>
+            <p class="text-secondary mb-4 mx-auto" style="max-width:500px;">
+                Upload your phishing dataset and get instant AI-powered predictions, or retrain the model with new data.
+            </p>
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <a href="/predict-page" class="btn btn-accent btn-lg px-5">
+                    <i class="fas fa-upload me-2"></i> Upload &amp; Predict
+                </a>
+                <a href="/docs" target="_blank" class="btn btn-outline-light btn-lg px-4">
+                    <i class="fas fa-code me-2"></i> Explore API
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

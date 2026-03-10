@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% block title %}Train Model{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1 class="display-5 fw-bold">
+            <i class="fas fa-brain text-accent me-2"></i>
+            Model <span class="text-gradient">Training</span>
+        </h1>
+        <p class="text-secondary mb-0">
+            Trigger the full ML pipeline &mdash; from data ingestion to model evaluation.
+        </p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="glass-card p-4 p-lg-5">
+                    <!-- Pipeline Steps -->
+                    <h4 class="fw-semibold mb-4">
+                        <i class="fas fa-diagram-project text-accent me-2"></i> Pipeline Overview
+                    </h4>
+
+                    <div class="pipeline-steps mb-4">
+                        <div class="pipeline-step" id="step-ingestion">
+                            <div class="step-indicator">
+                                <div class="step-dot"><i class="fas fa-database"></i></div>
+                                <div class="step-line"></div>
+                            </div>
+                            <div class="step-content">
+                                <h6 class="fw-semibold mb-1">Data Ingestion</h6>
+                                <p class="text-secondary small mb-0">
+                                    Fetch data from MongoDB, create feature store, and split into train/test sets.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pipeline-step" id="step-validation">
+                            <div class="step-indicator">
+                                <div class="step-dot"><i class="fas fa-check-double"></i></div>
+                                <div class="step-line"></div>
+                            </div>
+                            <div class="step-content">
+                                <h6 class="fw-semibold mb-1">Data Validation</h6>
+                                <p class="text-secondary small mb-0">
+                                    Validate schema, check column count, and generate drift report.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pipeline-step" id="step-transformation">
+                            <div class="step-indicator">
+                                <div class="step-dot"><i class="fas fa-wand-magic-sparkles"></i></div>
+                                <div class="step-line"></div>
+                            </div>
+                            <div class="step-content">
+                                <h6 class="fw-semibold mb-1">Data Transformation</h6>
+                                <p class="text-secondary small mb-0">
+                                    Handle missing values with KNN Imputer and create preprocessor pipeline.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pipeline-step" id="step-training">
+                            <div class="step-indicator">
+                                <div class="step-dot"><i class="fas fa-robot"></i></div>
+                                <div class="step-line"></div>
+                            </div>
+                            <div class="step-content">
+                                <h6 class="fw-semibold mb-1">Model Training &amp; Evaluation</h6>
+                                <p class="text-secondary small mb-0">
+                                    Train 6 classifiers with GridSearchCV, evaluate metrics, and save the best model.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pipeline-step" id="step-done">
+                            <div class="step-indicator">
+                                <div class="step-dot"><i class="fas fa-flag-checkered"></i></div>
+                            </div>
+                            <div class="step-content">
+                                <h6 class="fw-semibold mb-1">Deployment Ready</h6>
+                                <p class="text-secondary small mb-0">
+                                    Artifacts synced and model saved for prediction.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Train Button -->
+                    <button class="btn btn-accent btn-lg w-100" id="trainBtn" onclick="startTraining()">
+                        <i class="fas fa-play me-2"></i>
+                        <span id="trainBtnText">Start Training Pipeline</span>
+                        <span id="trainBtnSpinner" class="d-none">
+                            <span class="spinner-border spinner-border-sm me-2"></span> Training in progress...
+                        </span>
+                    </button>
+
+                    <!-- Status -->
+                    <div id="trainStatus" class="mt-4 d-none">
+                        <div class="alert" id="trainAlert" role="alert"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Side Info -->
+            <div class="col-lg-4">
+                <div class="glass-card p-4 mb-4">
+                    <h5 class="fw-semibold mb-3">
+                        <i class="fas fa-gear text-accent me-2"></i> Configuration
+                    </h5>
+                    <ul class="config-list list-unstyled mb-0">
+                        <li>
+                            <span class="text-secondary">Test Split Ratio</span>
+                            <span class="fw-semibold">20%</span>
+                        </li>
+                        <li>
+                            <span class="text-secondary">KNN Neighbors</span>
+                            <span class="fw-semibold">3</span>
+                        </li>
+                        <li>
+                            <span class="text-secondary">CV Folds</span>
+                            <span class="fw-semibold">3</span>
+                        </li>
+                        <li>
+                            <span class="text-secondary">Min Expected Score</span>
+                            <span class="fw-semibold">0.60</span>
+                        </li>
+                        <li>
+                            <span class="text-secondary">Overfit Threshold</span>
+                            <span class="fw-semibold">0.05</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="glass-card p-4">
+                    <h5 class="fw-semibold mb-3">
+                        <i class="fas fa-triangle-exclamation text-warning me-2"></i> Note
+                    </h5>
+                    <p class="text-secondary small mb-0">
+                        Training may take several minutes depending on your hardware and dataset size.
+                        The pipeline compares 6 models with hyperparameter tuning via GridSearchCV.
+                        Do not close this page during training.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function startTraining() {
+    const btn = document.getElementById('trainBtn');
+    const btnText = document.getElementById('trainBtnText');
+    const btnSpinner = document.getElementById('trainBtnSpinner');
+    const status = document.getElementById('trainStatus');
+    const alert = document.getElementById('trainAlert');
+
+    // Disable and show spinner
+    btn.disabled = true;
+    btnText.classList.add('d-none');
+    btnSpinner.classList.remove('d-none');
+    status.classList.add('d-none');
+
+    // Animate pipeline steps
+    const steps = ['step-ingestion', 'step-validation', 'step-transformation', 'step-training', 'step-done'];
+    steps.forEach(s => document.getElementById(s).classList.remove('step-active', 'step-complete'));
+    document.getElementById('step-ingestion').classList.add('step-active');
+
+    try {
+        const response = await fetch('/train', { method: 'GET' });
+        const text = await response.text();
+
+        if (response.ok) {
+            steps.forEach(s => {
+                document.getElementById(s).classList.remove('step-active');
+                document.getElementById(s).classList.add('step-complete');
+            });
+            alert.className = 'alert alert-success';
+            alert.innerHTML = '<i class="fas fa-check-circle me-2"></i><strong>Training Complete!</strong> ' + text;
+        } else {
+            alert.className = 'alert alert-danger';
+            alert.innerHTML = '<i class="fas fa-xmark-circle me-2"></i><strong>Error:</strong> ' + text;
+        }
+    } catch (err) {
+        alert.className = 'alert alert-danger';
+        alert.innerHTML = '<i class="fas fa-xmark-circle me-2"></i><strong>Network Error:</strong> ' + err.message;
+    }
+
+    status.classList.remove('d-none');
+    btn.disabled = false;
+    btnText.classList.remove('d-none');
+    btnSpinner.classList.add('d-none');
+}
+</script>
+{% endblock %}

@@ -13,8 +13,9 @@ from networksecurity.logging.logger import logging
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI,UploadFile,Request
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from uvicorn import run as app_run
-from fastapi.responses import RedirectResponse, Response
+from fastapi.responses import RedirectResponse, Response, FileResponse
 from starlette.responses import Response
 from dotenv import load_dotenv
 from networksecurity.utils.main_utils.utils import load_object 
@@ -36,6 +37,7 @@ collection = db[DATA_INGESTION_COLLECTION_NAME]
 
 
 app=FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 origins=["*"]
 
@@ -52,9 +54,18 @@ app.add_middleware(
 
 
 @app.get("/",tags=["authentication"])
-async def index():
-    return RedirectResponse(url="/docs")
+async def index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request, "active_page": "home"})
 
+
+@app.get("/predict-page")
+async def predict_page(request: Request):
+    return templates.TemplateResponse("predict.html", {"request": request, "active_page": "predict"})
+
+
+@app.get("/train-page")
+async def train_page(request: Request):
+    return templates.TemplateResponse("train.html", {"request": request, "active_page": "train"})
 
 
 @app.get("/train")
@@ -76,13 +87,35 @@ def predict_route(request: Request, file: UploadFile):
         y_pred = model.predict(network_data)
         df["predicted_column"] = np.where(y_pred == 1, "Legitimate", "Phishing")
         df.to_csv("prediction_output/output.csv", index=False)
+
+        legitimate_count = int((df["predicted_column"] == "Legitimate").sum())
+        phishing_count = int((df["predicted_column"] == "Phishing").sum())
+        total_rows = len(df)
+        phishing_rate = round((phishing_count / total_rows) * 100, 1) if total_rows else 0
+
         table = df.head(100).to_html(classes="table table-striped", index=False)
         return templates.TemplateResponse(
             "table.html",
-            {"request": request, "table": table, "total_rows": len(df)},
+            {
+                "request": request,
+                "table": table,
+                "total_rows": total_rows,
+                "legitimate_count": legitimate_count,
+                "phishing_count": phishing_count,
+                "phishing_rate": phishing_rate,
+                "active_page": "predict",
+            },
         )
     except Exception as e:
         raise NetworkSecurityException(e, sys) from e
+
+
+@app.get("/download-results")
+async def download_results():
+    file_path = "prediction_output/output.csv"
+    if os.path.exists(file_path):
+        return FileResponse(file_path, filename="prediction_results.csv", media_type="text/csv")
+    return Response(content="No results available yet.", status_code=404)
     
 if __name__ == "__main__":
-    app_run(app, host="0.0.0.0", port=8000, timeout_keep_alive=300)
+    app_run(app, host="localhost", port=8000, timeout_keep_alive=300)
